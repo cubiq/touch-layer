@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+
+<script type="application/javascript" src="../../src/gestures.js"></script>
+
+<script type="text/javascript">
+//document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+
+function loaded () {
+	setTimeout(function () {
+		gt('#tap').on('tap', activate);
+		gt('#doubletap').on('doubletap', activate);
+		gt('#taphold').on('taphold', activate);
+		gt('#tap2fingers').on('tap', activate, { fingers: 2 });
+	}, 100);
+}
+
+function activate () {
+	var el = gt('#' + this.el.attr('id') + '-label');
+	el.removeClass('active');
+
+	setTimeout(function () {
+		el.addClass('active');
+	}, 0);
+}
+
+</script>
+
+<style>
+body {
+	font-family:helvetica;
+	font-size:14px;
+}
+div {
+	width:150px; height:150px;
+	line-height:150px;
+	border:3px solid #bbb;
+	-webkit-border-radius:8px;
+	text-align:center;
+}
+
+div.active {
+	background:#bbb;
+}
+
+p {
+	width:150px;
+	text-align:center;
+	margin:0 0 20px 0;
+	padding:0;
+	color:#fff;
+}
+
+p.active {
+	-webkit-animation-name:activate;
+	-webkit-animation-duration:2s;
+	-webkit-animation-iteration-count:1;
+	-webkit-animation-timing-function:ease-out;
+}
+
+@-webkit-keyframes activate {
+	0% { color:#a00; }
+	50% { color:#a00; }
+	100% { color:#fff; }
+}
+
+</style>
+</head>
+
+<body onload="loaded()">
+
+<div id="tap">tap</div>
+<p id="tap-label">activated!</p>
+
+<div id="doubletap">double</div>
+<p id="doubletap-label">activated!</p>
+
+<div id="taphold">tap hold</div>
+<p id="taphold-label">activated!</p>
+
+<div id="tap2fingers">2 fingers tap</div>
+<p id="tap2fingers-label">activated!</p>
+
+</body>
+</html>

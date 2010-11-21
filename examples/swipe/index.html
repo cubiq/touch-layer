@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+
+<script type="application/javascript" src="../../src/gestures.js"></script>
+
+<script type="text/javascript">
+//document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+
+function loaded () {
+	setTimeout(function () {
+		gt('#swipe').on('swipe', activate);
+		gt('#swipe2').on('swipe', activate, { activateOn: 'move' });
+		gt('#swipeleft').on('swipeleft', activate);
+		gt('#swiperight').on('swiperight', activate);
+		gt('#swipe2fingers').on('swipe', activate, { fingers: 2 });
+	}, 100);
+}
+
+function activate () {
+	var el = gt('#' + this.el.attr('id') + '-label');
+	el.removeClass('active');
+
+	setTimeout(function () {
+		el.addClass('active');
+	}, 0);
+}
+
+</script>
+
+<style>
+body {
+	font-family:helvetica;
+	font-size:14px;
+}
+div {
+	width:180px; height:100px;
+	line-height:100px;
+	border:3px solid #bbb;
+	-webkit-border-radius:8px;
+	text-align:center;
+}
+
+div.active {
+	background:#bbb;
+}
+
+p {
+	width:180px;
+	text-align:center;
+	margin:0 0 20px 0;
+	padding:0;
+	color:#fff;
+}
+
+p.active {
+	-webkit-animation-name:activate;
+	-webkit-animation-duration:2s;
+	-webkit-animation-iteration-count:1;
+	-webkit-animation-timing-function:ease-out;
+}
+
+@-webkit-keyframes activate {
+	0% { color:#a00; }
+	50% { color:#a00; }
+	100% { color:#fff; }
+}
+
+</style>
+</head>
+
+<body onload="loaded()">
+
+<div id="swipe">swipe (fired on end)</div>
+<p id="swipe-label">activated!</p>
+
+<div id="swipe2">swipe (fired on move)</div>
+<p id="swipe2-label">activated!</p>
+
+<div id="swipeleft">swipe left</div>
+<p id="swipeleft-label">activated!</p>
+
+<div id="swiperight">swipe right</div>
+<p id="swiperight-label">activated!</p>
+
+<div id="swipe2fingers">2 fingers swipe</div>
+<p id="swipe2fingers-label">activated!</p>
+
+</body>
+</html>

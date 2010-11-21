@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+
+<script type="application/javascript" src="../../src/gestures.js"></script>
+
+<script type="text/javascript">
+document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+document.addEventListener('webkitTransitionEnd', function (e) { e.target.className = ''; }, false);
+
+function loaded () {
+	setTimeout(function () {
+		gt('#pinch').on('pinch', activate);
+		gt('#zoom').on('zoom', activate);
+		gt('#rotate').on('rotate', activate);
+		gt('#gestures').on('gestures', activate, { applyTransform: true });
+	}, 100);
+}
+
+function activate () {
+	var that = this,
+		el = gt('#' + that.el.attr('id') + '-label');
+	el.removeClass('active');
+	that.el.removeClass('active');
+
+	setTimeout(function () {
+		el.addClass('active');
+		that.el.addClass('active');
+	}, 0);
+}
+
+</script>
+
+<style>
+body {
+	font-family:helvetica;
+	font-size:14px;
+}
+
+div {
+	width:150px; height:150px;
+	line-height:150px;
+	border:3px solid #bbb;
+	-webkit-border-radius:8px;
+	text-align:center;
+	-webkit-transform:scale(1);
+	-webkit-transition-duration:1s;
+	-webkit-transform-timing-function:ease-out;
+	-webkit-transition-property:-webkit-transform;
+}
+
+#gestures {
+	display:block;
+	width:150px; height:150px;
+	line-height:150px;
+	border:3px solid #bbb;
+	-webkit-border-radius:8px;
+	text-align:center;
+}
+
+.gesturing {
+	background:#bbb;
+	opacity:0.7;
+}
+
+p {
+	width:150px;
+	text-align:center;
+	margin:0 0 20px 0;
+	padding:0;
+	color:#fff;
+}
+
+p.active {
+	-webkit-animation-name:activate;
+	-webkit-animation-duration:2s;
+	-webkit-animation-iteration-count:1;
+	-webkit-animation-timing-function:ease-out;
+}
+
+@-webkit-keyframes activate {
+	0% { color:#a00; }
+	50% { color:#a00; }
+	100% { color:#fff; }
+}
+
+#pinch.active {
+	-webkit-transform:scale(0.5);
+}
+
+#zoom.active {
+	-webkit-transform:scale(1.5);
+}
+
+#rotate.active {
+	-webkit-transform:rotate(180deg);
+}
+
+
+</style>
+</head>
+
+<body onload="loaded()">
+
+<div id="pinch">pinch</div>
+<p id="pinch-label">activated!</p>
+
+<div id="zoom">zoom</div>
+<p id="zoom-label">activated!</p>
+
+<div id="rotate">rotate</div>
+<p id="rotate-label">activated!</p>
+
+<span id="gestures">realtime gestures</span>
+<p id="gestures-label">activated!</p>
+
+</body>
+</html>
