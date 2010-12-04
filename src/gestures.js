@@ -438,7 +438,7 @@ TouchLayer.prototype = {
 		var that = this,
 			point = $.isTouch ? e.touches[0] : e;
 
-		that.fingers = e.touches.length;
+		that.fingers = $.isTouch ? e.touches.length : 1;
 
 		that.options.onBeforeStart.call(that, e);
 
@@ -502,7 +502,7 @@ TouchLayer.prototype = {
 			point = $.isTouch ? e.changedTouches[0] : e,
 			oldDirX, oldDirY;
 
-		that.fingers = e.touches.length;
+		that.fingers = $.isTouch ? e.touches.length : 1;
 
 		that.options.onBeforeMove.call(that, e);
 
@@ -511,7 +511,7 @@ TouchLayer.prototype = {
 		}
 
 		// Number of finger used
-		that.fingers = e.changedTouches.length;
+		that.fingers = $.isTouch ? e.changedTouches.length : 1;
 
 		// Distance from previous interpolation
 		that.deltaX = that.x - point.pageX;
@@ -578,7 +578,7 @@ TouchLayer.prototype = {
 
 		that.options.onBeforeEnd.call(that, e);
 
-		that.fingers = e.touches.length;
+		that.fingers = $.isTouch ? e.touches.length : 1;
 
 		if (that.fingers != 0) {
 			return;
