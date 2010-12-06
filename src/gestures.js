@@ -99,7 +99,40 @@ NL.prototype = {
 			eventFn[customEvents[type].type](this, type, fn, defaults);
 		});
 	},
-	
+
+	off: function (type, fn) {
+		if (!type) {
+			return;
+		}
+
+		var that = this;
+
+		type = type.toLowerCase();
+
+		if (!customEvents[type]) {
+			return that;
+		}
+
+		var results = [];
+		for (var i=(eventList.length - 1); i >= 0; i--) {
+			if (this[0] == eventList[i].el[0]) {
+				var events = eventList[i];
+				if (events.type === events.type) {
+					if (!fn || events.fn === fn) {
+						results.push(events);
+						eventList.splice(i, 1);
+					}
+				}
+			}
+		}
+		for (var i=0, len=results.length; i<len; i++) {
+			var touchlayer = results[i];
+			if (touchlayer.options && touchlayer.options.onEnd) {
+				touchlayer.options.onEnd.call(touchlayer);
+			}
+		}
+	},
+
 	getEvents: function () {
 		var that = this,
 		 	i, l = eventList.length,
@@ -381,6 +414,7 @@ function TouchLayer (el, type, fn, options) {
 	that.el = $(el);
 	that.callback = fn;
 	that.type = type;
+	that.fn = fn;
 
 	that.options = {
 		onInit: function () {},
