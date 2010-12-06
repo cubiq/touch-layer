@@ -404,7 +404,7 @@ function TouchLayer (el, type, fn, options) {
 };
 	
 TouchLayer.prototype = {
-	moveThreshold: 10,		// 2 pixels minimum, default=10
+	moveThreshold: 2,		// 2 pixels minimum, default=10
 	neededTouches: 1,
 
 	handleEvent: function (e) {
@@ -578,7 +578,7 @@ TouchLayer.prototype = {
 
 		that.options.onBeforeEnd.call(that, e);
 
-		that.fingers = $.isTouch ? e.touches.length : 1;
+		that.fingers = $.isTouch ? e.touches.length : 0;
 
 		if (that.fingers != 0) {
 			return;
