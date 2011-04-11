@@ -37,6 +37,9 @@ var $ = function (query) {
 		swipe: { type: 'swipe', options: {} },
 		swipeleft: { type: 'swipe', options: { direction: ['W'] } },
 		swiperight: { type: 'swipe', options: { direction: ['E'] } },
+		pan: { type: 'swipe', options: { fingers: 2 } },
+		panup: { type: 'swipe', options: { fingers: 2, direction: ['N'] } },
+		pandown: { type: 'swipe', options: { fingers: 2, direction: ['S'] } },
 		gestures: { type: 'gesture', options: { scale: true, rotate: true } },
 		pinch: { type: 'gesture', options: { scale: true, maxScale: 1, scaleThreshold: 0.2 } },
 		zoom: { type: 'gesture', options: { scale: true, minScale: 1, scaleThreshold: 0.2 } },
@@ -69,7 +72,7 @@ $.extend({
 	startEv: $.isTouch ? 'touchstart' : 'mousedown',
 	moveEv: $.isTouch ? 'touchmove' : 'mousemove',
 	endEv: $.isTouch ? 'touchend' : 'mouseup',
-	cancelEv: $.isTouch ? 'touchcancel' : 'mouseup',
+	cancelEv: $.isTouch ? 'touchcancel' : 'mouseup'
 }, $);
 
 NL.prototype = {
@@ -219,11 +222,23 @@ NL.prototype = {
 		return that.each(function () {
 			this.setAttribute(name, value);
 		});
-	},
-}
+	}
+};
 
 eventFn.tap = function (el, type, fn, options) {
 	options = options || {};
+
+	function isRightClick(e) {
+		var rightclick = false;
+
+		if (!$.isTouch) {
+			// http://www.quirksmode.org/js/events_properties.html
+			if (!e) var e = window.event;
+			if (e.which) rightclick = (e.which == 3);
+			else if (e.button) rightclick = (e.button == 2);
+		}
+		return rightclick;
+	}
 
 	eventList.push(new TouchLayer(el, type, fn, {
 		onInit: function () {
@@ -231,8 +246,10 @@ eventFn.tap = function (el, type, fn, options) {
 
 			me.ns = {
 				tapCount: 0,
+				anybutton: false,
 				neededTaps: options.neededTaps || 1,
 				interval: options.interval || 400,
+				expire: options.expire || 0,
 				retain: options.retain || 0
 			};
 
@@ -241,6 +258,10 @@ eventFn.tap = function (el, type, fn, options) {
 
 		onStart: function (e) {
 			var me = this;
+
+			if (!me.ns.anybutton && isRightClick(e)) {
+				me.expired = true;
+			}
 
 			e.preventDefault();
 
@@ -255,16 +276,30 @@ eventFn.tap = function (el, type, fn, options) {
 				}, me.ns.retain);
 			}
 
+			if (me.ns.expire) {
+				clearTimeout(me.ns.expireTimeout);
+
+				me.ns.expireTimeout = null;
+
+				me.ns.expireTimeout = setTimeout(function () {
+					me.expired = true;
+				}, me.ns.expire);
+			}
 		},
 
 		onMove: function () {
 			var me = this;
 
 			// If we moved don't perform the tap
-			if (me.moved) {
+			if (me.moved || me.expired) {
 				if (me.ns.retainTimeout) {
 					clearTimeout(me.ns.retainTimeout);
 					me.ns.retainTimeout = null;
+				}
+
+				if (me.ns.expireTimeout) {
+					clearTimeout(me.ns.expireTimeout);
+					me.ns.expireTimeout = null;
 				}
 
 				me.el.removeClass('active');
@@ -284,6 +319,11 @@ eventFn.tap = function (el, type, fn, options) {
 				return;
 			}
 
+			if (me.ns.expireTimeout) {
+				clearTimeout(me.ns.expireTimeout);
+				me.ns.expireTimeout = null;
+			}
+
 			if (me.ns.intervalTimeout) {
 				clearTimeout(me.ns.intervalTimeout);
 			}
@@ -298,7 +338,7 @@ eventFn.tap = function (el, type, fn, options) {
 
 			me.ns.tapCount = 0;
 
-			if (!me.moved) {
+			if (!me.moved && !me.expired) {
 				me.callback.call(me);
 			}
 		}
@@ -472,7 +512,7 @@ TouchLayer.prototype = {
 		var that = this,
 			point = $.isTouch ? e.touches[0] : e;
 
-		that.fingers = $.isTouch ? e.touches.length : 1;
+		that.fingers = $.isTouch ? e.touches.length : e.ctrlKey ? 2 : 1;
 
 		that.options.onBeforeStart.call(that, e);
 
@@ -523,6 +563,7 @@ TouchLayer.prototype = {
 
 		// We did not move yet
 		that.moved = false;
+		that.expired = false;
 
 		that.el.bind($.moveEv, that);
 		that.el.bind($.endEv, that);
@@ -536,16 +577,14 @@ TouchLayer.prototype = {
 			point = $.isTouch ? e.changedTouches[0] : e,
 			oldDirX, oldDirY;
 
-		that.fingers = $.isTouch ? e.touches.length : 1;
+		// Number of finger used
+		that.fingers = $.isTouch ? e.touches.length : e.ctrlKey ? 2 : 1;
 
 		that.options.onBeforeMove.call(that, e);
 
 		if (that.fingers != that.neededTouches) {
 			return;
 		}
-
-		// Number of finger used
-		that.fingers = $.isTouch ? e.changedTouches.length : 1;
 
 		// Distance from previous interpolation
 		that.deltaX = that.x - point.pageX;
@@ -723,5 +762,4 @@ TouchLayer.prototype = {
 
 window.gt = $;
 })();
-
 
