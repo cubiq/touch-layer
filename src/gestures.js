@@ -1,18 +1,18 @@
 /**
- * 
+ *
  * Copyright (c) 2010 Matteo Spinelli, http://cubiq.org/
  * Released under MIT license
  * http://cubiq.org/dropbox/mit-license.txt
- * 
+ *
  * Version 0.1 - Last updated: 2010.11.21
- * 
+ *
  */
 
 (function () {
 var $ = function (query) {
 		return new NL(query);
 	},
-	
+
 	NL = function (query) {
 		if (query.nodeType) {
 			query = [query];
@@ -29,7 +29,7 @@ var $ = function (query) {
 
 		return this;
 	},
-	
+
 	customEvents = {
 		tap: { type: 'tap', options: {} },
 		doubletap: { type: 'tap', options: { neededTaps: 2 } },
@@ -59,7 +59,7 @@ $.extend({
 	hasClass: function (el, className) {
 		return new RegExp('(^|\\s)' + className + '(\\s|$)').test(el.className);
 	},
-	
+
 	abs: function (value) {
 		return value < 0 ? -value : value;
 	}
@@ -77,7 +77,7 @@ NL.prototype = {
 		for (var i=0; i<this.length; i++) {
 			callback.call(this[i]);
 		}
-		
+
 		return this;
 	},
 
@@ -86,11 +86,11 @@ NL.prototype = {
 			defaults;
 
 		type = type.toLowerCase();
-		
+
 		if (!customEvents[type]) {
 			return that;
 		}
-		
+
 		defaults = customEvents[type].options;
 
 		$.extend(options, defaults);
@@ -137,13 +137,13 @@ NL.prototype = {
 		var that = this,
 		 	i, l = eventList.length,
 			result = [];
-		
+
 		for (i=0; i<l; i++) {
 			if (this[0] == eventList[i].el[0]) {
 				result.push(eventList[i]);
 			}
 		}
-		
+
 		return result;
 	},
 
@@ -152,18 +152,18 @@ NL.prototype = {
 			this.addEventListener(type, fn, !!capture);
 		});
 	},
-	
+
 	unbind: function (type, fn, capture) {
 		return this.each(function () {
 			this.removeEventListener(type, fn, !!capture);
 		});
 	},
-	
+
 	// Returns the first element className
 	hasClass: function (className) {
 		return $.hasClass(this[0], className);
 	},
-	
+
 	// Add one or more classes to all elements
 	addClass: function () {
 		var className = arguments;
@@ -175,23 +175,23 @@ NL.prototype = {
 				}
 			});
 		}
-		
+
 		return this;
 	},
-	
+
 	// Remove one or more classes from all elements
 	removeClass: function () {
 		var className = arguments;
-		
+
 		for (var i=0, l=className.length; i<l; i++) {
 			this.each(function () {
 				this.className = this.className.replace(new RegExp('(^|\\s+)' + className[i] + '(\\s+|$)'), ' ');
 			});
 		}
-		
+
 		return this;
 	},
-	
+
 	// Set CSS style
 	style: function (attrib, value) {
 		if (typeof attrib == 'string' && value === undefined) {
@@ -208,14 +208,14 @@ NL.prototype = {
 			}
 		});
 	},
-	
+
 	attr: function (name, value) {
 		var that = this;
-		
+
 		if (value === undefined) {
 			return that[0].getAttribute(name);
 		}
-		
+
 		return that.each(function () {
 			this.setAttribute(name, value);
 		});
@@ -228,14 +228,14 @@ eventFn.tap = function (el, type, fn, options) {
 	eventList.push(new TouchLayer(el, type, fn, {
 		onInit: function () {
 			var me = this;
-			
+
 			me.ns = {
 				tapCount: 0,
 				neededTaps: options.neededTaps || 1,
 				interval: options.interval || 400,
 				retain: options.retain || 0
 			};
-			
+
 			me.neededTouches = options.fingers || 1;
 		},
 
@@ -245,7 +245,7 @@ eventFn.tap = function (el, type, fn, options) {
 			e.preventDefault();
 
 			me.el.addClass('active');
-			
+
 			if (me.ns.retain) {
 				clearTimeout(me.ns.retainTimeout);
 				me.ns.retainTimeout = null;
@@ -259,7 +259,7 @@ eventFn.tap = function (el, type, fn, options) {
 
 		onMove: function () {
 			var me = this;
-			
+
 			// If we moved don't perform the tap
 			if (me.moved) {
 				if (me.ns.retainTimeout) {
@@ -287,7 +287,7 @@ eventFn.tap = function (el, type, fn, options) {
 			if (me.ns.intervalTimeout) {
 				clearTimeout(me.ns.intervalTimeout);
 			}
-			
+
 			if (me.ns.tapCount < me.ns.neededTaps) {
 				me.ns.intervalTimeout = setTimeout(function () {
 					me.ns.tapCount = 0;
@@ -311,7 +311,7 @@ eventFn.swipe = function (el, type, fn, options) {
 	eventList.push(new TouchLayer(el, type, fn, {
 		onInit: function () {
 			var me = this;
-			
+
 			me.ns = {
 				distance: options.distance || 60,
 				direction: options.direction || ['E', 'W'],
@@ -320,12 +320,12 @@ eventFn.swipe = function (el, type, fn, options) {
 
 			me.neededTouches = options.fingers || 1;
 		},
-		
+
 		onStart: function (e) {
 			e.preventDefault();
 			this.ns.activated = false;
 		},
-		
+
 		onMove: function () {
 			var me = this;
 
@@ -336,10 +336,10 @@ eventFn.swipe = function (el, type, fn, options) {
 				me.callback(me);
 			}
 		},
-		
+
 		onEnd: function () {
 			var me = this;
-	
+
 			if (me.ns.activateOn == 'end' && me.ns.direction.indexOf(me.startDir) != -1 && (
 					(me.absDistX >= me.ns.distance && (me.startDir == 'E' || me.startDir == 'W')) ||
 					(me.absDistY >= me.ns.distance && (me.startDir == 'N' || me.startDir == 'S')))) {
@@ -355,7 +355,7 @@ eventFn.gesture = function (el, type, fn, options) {
 	eventList.push(new TouchLayer(el, type, fn, {
 		onInit: function () {
 			var me = this;
-			
+
 			me.ns = {
 				scaleThreshold: options.scaleThreshold || 0,
 				rotateThreshold: options.rotateThreshold || 0,
@@ -363,15 +363,15 @@ eventFn.gesture = function (el, type, fn, options) {
 				maxScale: options.maxScale || 0,
 				applyTransform: options.applyTransform
 			};
-			
+
 			me.applyRotate = !!options.rotate;
 			me.applyScale = !!options.scale;
 		},
-		
+
 		onStart: function () {
 			this.ns.activated = false;
 		},
-		
+
 		onChange: function () {
 			var me = this;
 
@@ -379,10 +379,10 @@ eventFn.gesture = function (el, type, fn, options) {
 				me.el.style({ webkitTransform: me.transform });
 			}
 		},
-		
+
 		onEnd: function () {
 			var me = this;
-				
+
 			if (me.applyScale && me.ns.minScale && me.relScale > me.ns.minScale + me.ns.scaleThreshold) {			// Zoom
 				me.callback(me);
 				me.ns.activated = true;
@@ -393,7 +393,7 @@ eventFn.gesture = function (el, type, fn, options) {
 				me.callback(me);
 				me.ns.activated = true;
 			}
-			
+
 			if (me.applyRotate && !me.ns.activated && $.abs(me.relRotation) > me.ns.rotateThreshold) {
 				me.callback(me);
 			}
@@ -410,7 +410,7 @@ eventFn.gesture = function (el, type, fn, options) {
  */
 function TouchLayer (el, type, fn, options) {
 	var that = this;
-	
+
 	that.el = $(el);
 	that.callback = fn;
 	that.type = type;
@@ -436,7 +436,7 @@ function TouchLayer (el, type, fn, options) {
 		that.el.bind($.startEv, that);
 	}
 };
-	
+
 TouchLayer.prototype = {
 	moveThreshold: 2,		// 2 pixels minimum, default=10
 	neededTouches: 1,
@@ -492,7 +492,7 @@ TouchLayer.prototype = {
 		// Start position
 		that.startX = point.pageX;
 		that.startY = point.pageY;
-			
+
 		// Init angle
 //		that.angle = 0;
 
@@ -517,7 +517,7 @@ TouchLayer.prototype = {
 		that.startTime = e.timeStamp;
 		that.currentTime = e.timeStamp;
 		that.duration = 0;
-			
+
 		// Init number of strokes
 //		that.strokes = 0;
 
@@ -530,7 +530,7 @@ TouchLayer.prototype = {
 
 		that.options.onStart.call(that, e);
 	},
-	
+
 	_move: function (e) {
 		var that = this,
 			point = $.isTouch ? e.changedTouches[0] : e,
@@ -597,7 +597,7 @@ TouchLayer.prototype = {
 				that.startDir+= that.distX > 0 ? 'E' : 'W';
 			}
 		}
-		
+
 		// Event time
 		that.currentTime = e.timeStamp;
 		if (that.currentTime - that.startTime > 250) {
@@ -606,7 +606,7 @@ TouchLayer.prototype = {
 
 		that.options.onMove.call(that, e);
 	},
-	
+
 	_end: function (e) {
 		var that = this;
 
@@ -626,7 +626,7 @@ TouchLayer.prototype = {
 		that.el.unbind($.moveEv, that);
 		that.el.unbind($.endEv, that);
 		that.el.unbind($.cancelEv, that);
-		
+
 		that.options.onEnd.call(that, e);
 	},
 
@@ -640,19 +640,19 @@ TouchLayer.prototype = {
 		var that = this;
 
 		that.el.addClass('gesturing');
-		
+
 		that.scale = 1;
 		that.rotation = 0;
 		that.transform = '';
-		
+
 		that.startTime = e.timeStamp;
 		that.duration = 0;
-		
+
 		// We are using a matrix so not to collide with other transforms
 		that.matrix = new WebKitCSSMatrix(that.el.style('-webkit-transform'));
 
 		that.options.onStart.call(that, e);
-		
+
 		that.el.bind('gesturechange', that);
 		that.el.bind('gestureend', that);
 		that.el.bind('gesturecancel', that);
@@ -669,7 +669,7 @@ TouchLayer.prototype = {
 			that.scale*= e.scale;
 			transform = transform.scale(e.scale);
 		}
-		
+
 		if (that.applyRotate) {
 			that.rotation*= e.rotation;
 			transform = transform.rotate(e.rotation);
@@ -700,10 +700,10 @@ TouchLayer.prototype = {
 
 		that.options.onEnd.call(that, e);
 	},
-	
+
 	destroy: function () {
 		var that = this;
-		
+
 		if (customEvents[type].type == 'gesture') {
 			that.el.unbind('gesturestart', that);
 			that.el.unbind('gesturechange', that);
@@ -715,7 +715,7 @@ TouchLayer.prototype = {
 			that.el.unbind($.endEv, that);
 			that.el.unbind($.cancelEv, that);
 		}
-		
+
 		return null;
 	}
 };
